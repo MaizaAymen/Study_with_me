@@ -6,7 +6,12 @@ const port = 4000;
 require('dotenv').config()
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // Remplace par l'URL de ton frontend
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: 'Content-Type,Authorization'
+}));
+
 app.listen(port, () => {
     console.log('Server is running on port 4000');
 });
