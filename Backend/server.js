@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 const app = express();
 const cors = require('cors');
 const port = 4000;
+require('dotenv').config()
 
 app.use(express.json());
 app.use(cors());
@@ -10,7 +11,7 @@ app.listen(port, () => {
     console.log('Server is running on port 4000');
 });
 
-const apikey = "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";
+const apikey = process.env.apikey;
 
 // Handle first message
 app.post('/chat', async (req, res) => {
@@ -46,7 +47,7 @@ app.post('/chat', async (req, res) => {
             
             const response2 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
-                headers: {
+                headers: {              
                     "Authorization": `Bearer ${apikey}`,
                     "HTTP-Referer": "<YOUR_SITE_URL>", // Optional
                     "X-Title": "<YOUR_SITE_NAME>", // Optional
