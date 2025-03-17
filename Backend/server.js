@@ -41,6 +41,11 @@ app.post('/chat', async (req, res) => {
                 "model": "google/gemini-2.0-pro-exp-02-05:free",
                 "messages": [
                     {
+"role"
+     :"system"   
+     ,"content"
+     :"You are an AI that generates well-structured reports based on user input."},
+                    {
                         "role": "user",
                         "content": message
                     }
