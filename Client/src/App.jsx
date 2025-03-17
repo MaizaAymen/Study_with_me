@@ -54,7 +54,8 @@ function App() {
       if (matches.includes(part)) {
         return (
           <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="resource-link">
-            {part}
+            <LinkIcon />
+            <span>{part.replace(/(^\w+:|^)\/\//, "").substring(0, 30)}...</span>
           </a>
         )
       }
@@ -63,32 +64,115 @@ function App() {
     })
   }
 
+  // Simple icon components
+  const LinkIcon = () => (
+    <svg
+      className="icon"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+    </svg>
+  )
+
+  const MenuIcon = () => (
+    <svg
+      className="icon"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {sidebarOpen ? (
+        <>
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </>
+      ) : (
+        <>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </>
+      )}
+    </svg>
+  )
+
+  const ResourceIcon = () => (
+    <svg
+      className="icon"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+    </svg>
+  )
+
   return (
     <div className="app-container">
-      {/* Sidebar Toggle Button */}
-      <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-        {sidebarOpen ? "←" : "→"}
-      </button>
-
       {/* Sidebar */}
       <div className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
-          <h2>Resources</h2>
+          <h2>
+            <ResourceIcon /> Resources
+          </h2>
+          <button
+            className="sidebar-toggle"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+          >
+            <MenuIcon />
+          </button>
         </div>
+
         <div className="sidebar-content">
-          {response2 && (
+          {response2 ? (
             <div className="resource-section">
               <h3>Helpful Links</h3>
               <div className="resource-links">{formatLinks(response2)}</div>
             </div>
+          ) : (
+            <div className="empty-state">
+              <p>No resources available yet. Ask a question to get helpful links.</p>
+            </div>
           )}
+        </div>
+
+        <div className="sidebar-footer">
+          <p>Powered by AI Chat</p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="main-content">
+      <div className={`main-content ${sidebarOpen ? "" : "expanded"}`}>
         <div className="chat-header">
           <h1>Chat with me</h1>
+          {!sidebarOpen && (
+            <button className="sidebar-toggle-mobile" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar">
+              <MenuIcon />
+            </button>
+          )}
         </div>
 
         <div className="chat-messages">
