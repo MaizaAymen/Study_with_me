@@ -167,7 +167,7 @@ function App() {
       {/* Main Content */}
       <div className={`main-content ${sidebarOpen ? "" : "expanded"}`}>
         <div className="chat-header">
-          <h1>Chat with me</h1>
+          <h1>Study With Me</h1>
           {!sidebarOpen && (
             <button className="sidebar-toggle-mobile" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar">
               <MenuIcon />
