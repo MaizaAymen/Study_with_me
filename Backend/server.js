@@ -7,7 +7,7 @@ require('dotenv').config()
 
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:5173', // Remplace par l'URL de ton frontend
+    origin: 'https://study-with-me-eight.vercel.app/', // Remplace par l'URL de ton frontend
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization'
 }));
