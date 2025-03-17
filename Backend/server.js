@@ -22,12 +22,12 @@ const apikey = process.env.apikey;
 // Handle first message
 app.post('/chat', async (req, res) => {
     const { message } = req.body;
-    const message1=`give to me in in the form of report ${message}`;
-    // Please provide a comprehensive and well-structured report based 
-    // on the following details: ${message}. 
-    // The report should include an introduction, key findings, analysis, and a conclusion. 
-    // Ensure clarity, coherence, and a professional tone throughout. 
-    // Format it properly with headings and bullet points if necessary.
+    const message1=`Please provide a comprehensive and well-structured report based 
+    on the following details: ${message}. 
+   The report should include an introduction, key findings, analysis, and a conclusion. 
+   Ensure clarity, coherence, and a professional tone throughout. 
+   Format it properly with headings and bullet points if necessary.`;
+     
 
     try {
         // Send the first message to the API
@@ -44,7 +44,7 @@ app.post('/chat', async (req, res) => {
                 "messages": [
                     {
                         "role": "user",
-                        "content": message
+                        "content": message1
                     }
                 ]
             })
