@@ -19,6 +19,9 @@ app.listen(port, () => {
     console.log('Server is running on port 4000');
 });
 
+app.get('/',(res,req)=>{
+    res.send("hello world ")
+})
 const apikey = process.env.apikey;
 
 // Handle first message
