@@ -19,10 +19,12 @@ function App() {
       const res = await fetch("https://study-with-me-1oxo.vercel.app/chat", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({ message: input }),
-      })
+        mode: "cors", // Ajouté pour permettre les requêtes cross-origin
+    });
+    
 
       const data = await res.json()
       if (data.error) {
