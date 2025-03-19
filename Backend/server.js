@@ -30,13 +30,12 @@ app.post('/chat', async (req, res) => {
      
 
     try {
-        // Send the first message to the API
         const response1 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${apikey}`,
-                "HTTP-Referer": "<YOUR_SITE_URL>", // Optional
-                "X-Title": "<YOUR_SITE_NAME>", // Optional
+                "HTTP-Referer": "<YOUR_SITE_URL>",
+                "X-Title": "<YOUR_SITE_NAME>", 
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -60,8 +59,8 @@ app.post('/chat', async (req, res) => {
                 method: "POST",
                 headers: {              
                     "Authorization": `Bearer ${apikey}`,
-                    "HTTP-Referer": "<YOUR_SITE_URL>", // Optional
-                    "X-Title": "<YOUR_SITE_NAME>", // Optional
+                    "HTTP-Referer": "<YOUR_SITE_URL>", 
+                    "X-Title": "<YOUR_SITE_NAME>", 
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -82,7 +81,6 @@ app.post('/chat', async (req, res) => {
                 return res.json({ message1: messageContent1, message2: messageContent2 });
             } else {
                 console.log('No valid response from second query');
-                res.status(500).json({ error: 'No valid response from second query' });
             }
 
         } else {
