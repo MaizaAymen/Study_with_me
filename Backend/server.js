@@ -7,11 +7,11 @@ require('dotenv').config()
 
 app.use(express.json());
 app.use(cors({
-    origin: '*', 
+    origin: 'https://study-with-me-eight.vercel.app', // Met ton domaine ici
     methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
-    credentials: true
+    allowedHeaders: 'Content-Type,Authorization'
 }));
+
 
 
 
@@ -50,7 +50,7 @@ app.post('/chat', async (req, res) => {
                     }
                 ]
             })
-        });
+        },15000);
         const data1 = await response1.json();
         if (data1.choices && data1.choices[0] && data1.choices[0].message) {
             const messageContent1 = data1.choices[0].message.content;
