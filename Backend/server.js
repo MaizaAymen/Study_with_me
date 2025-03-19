@@ -49,7 +49,7 @@ app.post('/chat', async (req, res) => {
                 "messages": [
                     {
                         "role": "user",
-                        "content": message1
+                        "content": message
                     }
                 ]
             })
