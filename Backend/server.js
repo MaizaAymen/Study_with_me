@@ -7,11 +7,12 @@ require('dotenv').config()
 
 app.use(express.json());
 app.use(cors({
-    origin: ['https://study-with-me-eight.vercel.app', 'https://study-with-me-7otu.vercel.app'],
-    methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
+    origin: '*', // Remplacez par un domaine précis si nécessaire
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
+
 
 
 app.listen(port, () => {
