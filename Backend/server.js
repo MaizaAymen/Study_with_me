@@ -26,7 +26,7 @@ app.post('/chat', async (req, res) => {
     on the following details: ${message}. 
    The report should include an introduction, key findings, analysis, and a conclusion. 
    Ensure clarity, coherence, and a professional tone throughout. 
-   Format it properly with headings and bullet points if necessary.`;
+   Format it properly with headings and bullet points if necessary. and pls make it in only 3 line `;
      
 
     try {
@@ -44,7 +44,7 @@ app.post('/chat', async (req, res) => {
                 "messages": [
                     {
                         "role": "user",
-                        "content": message
+                        "content": message1
                     }
                 ]
             })
