@@ -73,7 +73,7 @@ app.post('/chat', async (req, res) => {
                         }
                     ]
                 })
-            });
+            },15000);
 
             const data2 = await response2.json();
             if (data2.choices && data2.choices[0] && data2.choices[0].message) {
