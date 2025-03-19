@@ -16,7 +16,7 @@ function App() {
     setError("")
 
     try {
-      const res = await fetch("https://study-with-me-7otu.vercel.app/chat", {
+      const res = await fetch("https://study-with-me-nakk.vercel.app/chat", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
