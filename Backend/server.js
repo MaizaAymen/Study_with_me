@@ -22,11 +22,11 @@ const apikey = process.env.apikey;
 // Handle first message
 app.post('/chat', async (req, res) => {
     const { message } = req.body;
-    const message1=`Please provide a comprehensive and well-structured report based 
+    const message1=`Please make in only 2 line provide a comprehensive and well-structured report based 
     on the following details: ${message}. 
    The report should include an introduction, key findings, analysis, and a conclusion. 
    Ensure clarity, coherence, and a professional tone throughout. 
-   Format it properly with headings and bullet points if necessary. and pls make it in only 3 line `;
+   Format it properly with headings and bullet points if necessary.`;
      
 
     try {
