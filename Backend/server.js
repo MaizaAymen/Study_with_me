@@ -53,7 +53,7 @@ app.post('/chat', async (req, res) => {
             const messageContent1 = data1.choices[0].message.content;
             console.log('First message response:', messageContent1);
 
-            const aymen = `Give me only 4 URL of docs form diffrent websites and he must be free this question : ${message}`;
+            const aymen = `Give me only 4 URL free and valid  of docs form diffrent websites and he must be free this question : ${message}`;
             
             const response2 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
