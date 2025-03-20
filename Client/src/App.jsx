@@ -1,35 +1,66 @@
-import { useState } from "react";
-import "./App.css";
 
+import { useState, useEffect } from "react"
+import "./App.css"
 
 const fetchWithTimeout = (url, options, timeout = 15000) => {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('Request timed out')), timeout);
+    const timer = setTimeout(() => reject(new Error("Request timed out")), timeout)
 
     fetch(url, options)
       .then((response) => {
-        clearTimeout(timer);
-        resolve(response);
+        clearTimeout(timer)
+        resolve(response)
       })
       .catch((err) => {
-        clearTimeout(timer);
-        reject(err);
-      });
-  });
-};
+        clearTimeout(timer)
+        reject(err)
+      })
+  })
+}
 
 function App() {
-  const [input, setInput] = useState("");
-  const [response1, setResponse1] = useState("");
-  const [response2, setResponse2] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [input, setInput] = useState("")
+  const [response1, setResponse1] = useState("")
+  const [response2, setResponse2] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+  // Track window resize for responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth)
+      // Auto-close sidebar on small screens
+      if (window.innerWidth < 768 && sidebarOpen) {
+        setSidebarOpen(false)
+      }
+      // Auto-open sidebar on larger screens
+      if (window.innerWidth >= 768 && !sidebarOpen) {
+        setSidebarOpen(true)
+      }
+    }
+
+    // Set initial sidebar state based on screen size
+    if (window.innerWidth >= 768) {
+      setSidebarOpen(true)
+    } else {
+      setSidebarOpen(false)
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent page refresh
-    setLoading(true);
-    setError("");
+    e.preventDefault() // Prevent page refresh
+    setLoading(true)
+    setError("")
+
+    // Close sidebar automatically on mobile when submitting
+    if (windowWidth < 768) {
+      setSidebarOpen(false)
+    }
 
     try {
       const res = await fetchWithTimeout("https://study-with-me-nakk.vercel.app/chat", {
@@ -39,31 +70,30 @@ function App() {
         },
         body: JSON.stringify({ message: input }),
         mode: "cors",
-      });
+      })
 
-      const data = await res.json();
+      const data = await res.json()
 
       if (data.error) {
-        setError(data.error);
+        setError(data.error)
       } else {
-        setResponse1(data.message1);
-        setResponse2(data.message2);
+        setResponse1(data.message1)
+        setResponse2(data.message2)
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
-
+  }
 
   const formatLinks = (text) => {
-    if (!text) return "";
+    if (!text) return ""
 
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urlRegex = /(https?:\/\/[^\s]+)/g
 
-    const parts = text.split(urlRegex);
-    const matches = text.match(urlRegex) || [];
+    const parts = text.split(urlRegex)
+    const matches = text.match(urlRegex) || []
 
     return parts.map((part, i) => {
       if (matches.includes(part)) {
@@ -72,11 +102,11 @@ function App() {
             <LinkIcon />
             <span>{part.replace(/(^\w+:|^)\/\//, "").substring(0, 30)}...</span>
           </a>
-        );
+        )
       }
-      return part;
-    });
-  };
+      return part
+    })
+  }
 
   // Simple icon components
   const LinkIcon = () => (
@@ -95,7 +125,7 @@ function App() {
       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
     </svg>
-  );
+  )
 
   const MenuIcon = () => (
     <svg
@@ -123,7 +153,7 @@ function App() {
         </>
       )}
     </svg>
-  );
+  )
 
   const ResourceIcon = () => (
     <svg
@@ -141,10 +171,20 @@ function App() {
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
     </svg>
-  );
+  )
+
+  // Handle sidebar toggle and add overlay for mobile
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
 
   return (
     <div className="app-container">
+      {/* Overlay for mobile when sidebar is open */}
+      {sidebarOpen && windowWidth < 768 && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
+      )}
+
       {/* Sidebar */}
       <div className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
@@ -153,7 +193,7 @@ function App() {
           </h2>
           <button
             className="sidebar-toggle"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
+            onClick={toggleSidebar}
             aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
           >
             <MenuIcon />
@@ -183,7 +223,7 @@ function App() {
         <div className="chat-header">
           <h1>Study With Me</h1>
           {!sidebarOpen && (
-            <button className="sidebar-toggle-mobile" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar">
+            <button className="sidebar-toggle-mobile" onClick={toggleSidebar} aria-label="Open sidebar">
               <MenuIcon />
             </button>
           )}
@@ -211,14 +251,15 @@ function App() {
               required
               className="chat-input"
             />
-            <button type="submit" className="send-button">
-              Send
+            <button type="submit" className="send-button" disabled={loading}>
+              {loading ? "Sending..." : "Send"}
             </button>
           </form>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
+
