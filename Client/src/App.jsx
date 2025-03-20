@@ -1,70 +1,82 @@
+import { useState } from "react";
+import "./App.css";
 
-import { useState } from "react"
-import "./App.css"
+// Timeout function for fetch request
+const fetchWithTimeout = (url, options, timeout = 15000) => {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Request timed out')), timeout);
+
+    fetch(url, options)
+      .then((response) => {
+        clearTimeout(timer);
+        resolve(response);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+};
 
 function App() {
-  const [input, setInput] = useState("")
-  const [response1, setResponse1] = useState("")
-  const [response2, setResponse2] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [input, setInput] = useState("");
+  const [response1, setResponse1] = useState("");
+  const [response2, setResponse2] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleSubmit = async (e) => {
-    e.preventDefault() // Prevents page refresh
-    setLoading(true)
-    setError("")
+    e.preventDefault(); // Prevent page refresh
+    setLoading(true);
+    setError("");
 
     try {
-      const res = await fetch("https://study-with-me-nakk.vercel.app/chat", {
+      const res = await fetchWithTimeout("https://study-with-me-nakk.vercel.app/chat", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ message: input }),
-        mode: "cors", // Ajouté pour permettre les requêtes cross-origin
-    });
-    
+        mode: "cors",
+      });
 
-      const data = await res.json()
+      const data = await res.json();
+
       if (data.error) {
-        setError(data.error)
+        setError(data.error);
       } else {
-        setResponse1(data.message1)
-        setResponse2(data.message2)
+        setResponse1(data.message1);
+        setResponse2(data.message2);
       }
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Function to format links in text
   const formatLinks = (text) => {
-    if (!text) return ""
+    if (!text) return "";
 
-    // Regular expression to find URLs
-    const urlRegex = /(https?:\/\/[^\s]+)/g
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
 
-    // Split the text by URLs and map through the parts
-    const parts = text.split(urlRegex)
-    const matches = text.match(urlRegex) || []
+    const parts = text.split(urlRegex);
+    const matches = text.match(urlRegex) || [];
 
     return parts.map((part, i) => {
-      // If this part is a URL (it matches with a URL from matches array)
       if (matches.includes(part)) {
         return (
           <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="resource-link">
             <LinkIcon />
             <span>{part.replace(/(^\w+:|^)\/\//, "").substring(0, 30)}...</span>
           </a>
-        )
+        );
       }
-      // Otherwise, it's just text
-      return part
-    })
-  }
+      return part;
+    });
+  };
 
   // Simple icon components
   const LinkIcon = () => (
@@ -83,7 +95,7 @@ function App() {
       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
     </svg>
-  )
+  );
 
   const MenuIcon = () => (
     <svg
@@ -111,7 +123,7 @@ function App() {
         </>
       )}
     </svg>
-  )
+  );
 
   const ResourceIcon = () => (
     <svg
@@ -129,7 +141,7 @@ function App() {
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
     </svg>
-  )
+  );
 
   return (
     <div className="app-container">
@@ -206,8 +218,7 @@ function App() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
-
+export default App;
