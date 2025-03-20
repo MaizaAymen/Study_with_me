@@ -12,9 +12,6 @@ app.use(cors({
     allowedHeaders: 'Content-Type,Authorization'
 }));
 
-app.listen(port,(req,res)=>{
-    console.log("server work ")
-})
 
 app.get('/',(req,res)=>{
     res.send("hello world ")
