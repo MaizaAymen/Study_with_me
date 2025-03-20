@@ -1,4 +1,3 @@
-
 * {
   margin: 0;
   padding: 0;
@@ -11,6 +10,7 @@ body {
   line-height: 1.6;
   color: #333;
   background-color: #f5f7fa;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 .app-container {
@@ -18,12 +18,25 @@ body {
   height: 100vh;
   position: relative;
   overflow: hidden;
+  width: 100%;
 }
 
 .icon {
   display: inline-block;
   vertical-align: middle;
   margin-right: 8px;
+}
+
+/* Sidebar overlay for mobile */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 90;
+  display: none;
 }
 
 .sidebar {
@@ -36,6 +49,7 @@ body {
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
   z-index: 100;
   border-right: 1px solid #eaeaea;
+  height: 100vh;
 }
 
 .sidebar.closed {
@@ -64,6 +78,7 @@ body {
   padding: 20px;
   overflow-y: auto;
   flex-grow: 1;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 .sidebar-footer {
@@ -87,10 +102,15 @@ body {
   justify-content: center;
   color: #2c3e50;
   transition: background-color 0.2s;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
 }
 
 .sidebar-toggle:hover {
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-toggle:active {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-toggle-mobile {
@@ -104,6 +124,7 @@ body {
   align-items: center;
   justify-content: center;
   color: #2c3e50;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
 }
 
 .main-content {
@@ -112,7 +133,9 @@ body {
   flex-direction: column;
   background-color: #f5f7fa;
   transition: all 0.3s ease;
-  width: 1200px;
+  width: calc(100% - 320px);
+  height: 100vh;
+  position: relative;
 }
 
 .main-content.expanded {
@@ -120,13 +143,15 @@ body {
 }
 
 .chat-header {
-  padding: 20px;
+  padding: 15px 20px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   z-index: 5;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
 }
 
 .chat-header h1 {
@@ -142,12 +167,16 @@ body {
   display: flex;
   flex-direction: column;
   background-color: #f9fafc;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 .chat-input-container {
-  padding: 20px;
+  padding: 15px;
   background-color: #fff;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
 }
 
 .chat-form {
@@ -164,6 +193,7 @@ body {
   outline: none;
   transition: all 0.3s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  -webkit-appearance: none; /* Remove default iOS styling */
 }
 
 .chat-input:focus {
@@ -181,6 +211,8 @@ body {
   font-size: 16px;
   font-weight: 500;
   transition: all 0.2s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
 }
 
 .send-button:hover {
@@ -190,6 +222,12 @@ body {
 
 .send-button:active {
   transform: translateY(1px);
+}
+
+.send-button:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .response-message {
@@ -205,6 +243,7 @@ body {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   line-height: 1.6;
+  word-wrap: break-word;
 }
 
 .resource-section {
@@ -247,6 +286,11 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
+.resource-link:active {
+  transform: translateY(0);
+  background-color: #e6e9ea;
+}
+
 .resource-link span {
   white-space: nowrap;
   overflow: hidden;
@@ -287,20 +331,96 @@ body {
   }
 }
 
+/* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .sidebar {
-    position: absolute;
+    position: fixed;
     height: 100%;
     width: 85%;
     max-width: 320px;
+    left: 0;
+    top: 0;
+  }
+
+  .sidebar-overlay {
+    display: block;
   }
 
   .main-content {
     width: 100%;
   }
 
-  .sidebar-toggle {
-    display: flex;
+  .chat-header {
+    padding: 12px 15px;
+  }
+
+  .chat-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .chat-messages {
+    padding: 15px;
+  }
+
+  .chat-input-container {
+    padding: 12px;
+  }
+
+  .chat-input {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .send-button {
+    padding: 10px 15px;
+    font-size: 15px;
+  }
+
+  .response-message {
+    max-width: 90%;
+  }
+
+  /* Adjust for small mobile screens */
+  @media (max-width: 480px) {
+    .sidebar {
+      width: 90%;
+    }
+
+    .chat-form {
+      gap: 8px;
+    }
+
+    .send-button {
+      padding: 10px 12px;
+    }
+
+    .message-content {
+      padding: 12px;
+    }
+  }
+
+  /* Adjust for landscape orientation */
+  @media (max-height: 500px) {
+    .chat-header {
+      padding: 8px 15px;
+    }
+
+    .chat-header h1 {
+      font-size: 1.2rem;
+    }
+
+    .chat-input-container {
+      padding: 8px;
+    }
+  }
+}
+
+/* Fix for iOS Safari 100vh issue */
+@supports (-webkit-touch-callout: none) {
+  .app-container,
+  .sidebar,
+  .main-content {
+    height: -webkit-fill-available;
   }
 }
 
