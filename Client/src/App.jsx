@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import "./App.css"
 
-const fetchWithTimeout = (url, options, timeout = 15000) => {
+const fetchWithTimeout = (url, options, timeout = 60000) => {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("Request timed out")), timeout)
 
@@ -25,8 +25,21 @@ function App() {
   const [response2, setResponse2] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  // Auth state
+  const [token, setToken] = useState(localStorage.getItem('token') || '')
+  const [authMode, setAuthMode] = useState('login') // or 'register'
+  const [authUser, setAuthUser] = useState('')
+  const [authPass, setAuthPass] = useState('')
+  const [authError, setAuthError] = useState('')
+  const [authLoading, setAuthLoading] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const [authName, setAuthName] = useState('')
+  const [authEmail, setAuthEmail] = useState('')
+  const [authConfirm, setAuthConfirm] = useState('')
+  const [authRole, setAuthRole] = useState('student')
+  const [showHistory, setShowHistory] = useState(false)
+  const [chatHistory, setChatHistory] = useState([])
 
   // Track window resize for responsive behavior
   useEffect(() => {
@@ -53,6 +66,61 @@ function App() {
     return () => window.removeEventListener("resize", handleResize)
   }, [sidebarOpen])
 
+  // Fetch chat history when authenticated
+  useEffect(() => {
+    if (token) {
+      fetch('http://localhost:4000/chats', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => setChatHistory(data))
+        .catch(err => console.error(err))
+    }
+  }, [token])
+
+  // Handle auth submit
+  const handleAuth = async (e) => {
+    e.preventDefault()
+    setAuthError('')
+    // Validate registration fields
+    if (authMode === 'register') {
+      if (!authName || !authEmail || !authUser || !authPass || !authConfirm || !authRole) return setAuthError('All fields are required')
+      if (authPass !== authConfirm) return setAuthError('Passwords do not match')
+    }
+    setAuthLoading(true)
+    try {
+      const res = await fetch(`http://localhost:4000/auth/${authMode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: authUser, password: authPass, name: authName, email: authEmail, role: authRole })
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setAuthError(data.error || 'Auth failed')
+      } else if (authMode === 'login') {
+        localStorage.setItem('token', data.token)
+        setToken(data.token)
+      } else {
+        // after register, switch to login
+        setAuthMode('login')
+        setAuthUser('')
+        setAuthPass('')
+      }
+    } catch (err) {
+      setAuthError(err.message)
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    setToken('')
+    setResponse1('')
+    setResponse2('')
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault() // Prevent page refresh
     if (!input.trim()) return // Prevent empty submissions
@@ -70,6 +138,7 @@ function App() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ message: input }),
         mode: "cors",
@@ -84,7 +153,12 @@ function App() {
         setResponse2(data.message2)
       }
     } catch (err) {
-      setError(err.message)
+      // Handle timeout explicitly
+      if (err.message === 'Request timed out') {
+        setError('The request timed out. Please try again — AI responses can take longer.');
+      } else {
+        setError(err.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -286,116 +360,178 @@ function App() {
     </svg>
   )
 
+  // Navbar component
+  const Navbar = () => (
+    <nav className="navbar">
+      <h1 className="nav-title">Study With Me</h1>
+      <div className="nav-links">
+        <button className={`nav-item ${!showHistory ? 'active' : ''}`} onClick={() => setShowHistory(false)}>Chat</button>
+        <button className={`nav-item ${showHistory ? 'active' : ''}`} onClick={() => setShowHistory(true)}>History</button>
+      </div>
+    </nav>
+  )
+
   // Handle sidebar toggle and add overlay for mobile
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)
   }
 
   return (
-    <div className="app-container">
-      {/* Overlay for mobile when sidebar is open */}
-      {sidebarOpen && windowWidth < 768 && (
-        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
-      )}
-
-      {/* Sidebar */}
-      <div className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
-        <div className="sidebar-header">
-          <h2>
-            <ResourceIcon /> Resources
-          </h2>
-          <button
-            className="sidebar-toggle"
-            onClick={toggleSidebar}
-            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-          >
-            <MenuIcon />
-          </button>
-        </div>
-
-        <div className="sidebar-content">
-          {response2 ? (
-            <div className="resource-section">
-              <h3>Helpful Links</h3>
-              <div className="resource-links">{formatLinks(response2)}</div>
-            </div>
-          ) : (
-            <div className="empty-state">
-              <p>No resources available yet. Ask a question to get helpful links.</p>
-            </div>
+    // If not authenticated, show login/register form
+    !token ? (
+      <div className="auth-container">
+        <div className="book book1"></div>
+        <div className="book book2"></div>
+        <div className="book book3"></div>
+        <form className="auth-form" onSubmit={handleAuth}>
+          <h2>{authMode === 'login' ? 'Login' : 'Register'}</h2>
+          {authError && <div className="auth-error">{authError}</div>}
+          {authMode === 'register' && (
+            <>
+              <input type="text" placeholder="Full Name" value={authName} onChange={e => setAuthName(e.target.value)} className="auth-input" disabled={authLoading} />
+              <input type="email" placeholder="Email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} className="auth-input" disabled={authLoading} />
+              <select value={authRole} onChange={e => setAuthRole(e.target.value)} className="auth-input auth-select" disabled={authLoading}>
+                <option value="">Select Role</option>
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+              </select>
+            </>
           )}
-        </div>
-
-        <div className="sidebar-footer">
-          <p>Powered by AI Chat</p>
-        </div>
+          <input type="text" placeholder="Username" value={authUser} onChange={e => setAuthUser(e.target.value)} className="auth-input" required disabled={authLoading} />
+          <input type="password" placeholder="Password" value={authPass} onChange={e => setAuthPass(e.target.value)} className="auth-input" required disabled={authLoading} />
+          {authMode === 'register' && <input type="password" placeholder="Confirm Password" value={authConfirm} onChange={e => setAuthConfirm(e.target.value)} className="auth-input" required disabled={authLoading} />}
+          <button type="submit" className="auth-button" disabled={authLoading}>
+            {authLoading ? 'Please wait...' : authMode === 'login' ? 'Login' : 'Register'}
+          </button>
+          <p className="auth-switch">
+            {authMode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
+            <button type="button" onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')} className="auth-switch-button">
+              {authMode === 'login' ? 'Register' : 'Login'}
+            </button>
+          </p>
+        </form>
       </div>
+    ) : (
+      <div className="app-container">
+        <Navbar />
+        <button className="logout-button" onClick={handleLogout}>Logout</button>
+        {/* Overlay for mobile when sidebar is open */}
+        {sidebarOpen && windowWidth < 768 && (
+          <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
+        )}
 
-      {/* Main Content */}
-      <div className={`main-content ${sidebarOpen ? "" : "expanded"}`}>
-        <div className="chat-header">
-          <h1 className="app-title">
-            <span className="title-gradient">Study</span> With Me
-          </h1>
-          {!sidebarOpen && (
-            <button className="sidebar-toggle-mobile" onClick={toggleSidebar} aria-label="Open sidebar">
+        {/* Sidebar */}
+        <div className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+          <div className="sidebar-header">
+            <h2>
+              <ResourceIcon /> Resources
+            </h2>
+            <button
+              className="sidebar-toggle"
+              onClick={toggleSidebar}
+              aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+            >
               <MenuIcon />
             </button>
-          )}
-        </div>
+          </div>
 
-        <div className="chat-messages">
-          {error && <div className="error-message">{error}</div>}
-
-          {response1 && (
-            <div className="response-message">
-              <div className="message-content">{formatResponseText(response1)}</div>
-            </div>
-          )}
-
-          {!response1 && !error && (
-            <div className="welcome-message">
-              <h2 className="welcome-title">
-                Welcome to <span className="title-gradient">Study With Me</span>
-              </h2>
-              <p>Ask any question to get started. I'm here to help with your studies!</p>
-              <div className="welcome-suggestions">
-                <p className="suggestion-title">Try asking about:</p>
-                <div className="suggestion-buttons">
-                  <button className="suggestion-button" onClick={() => setInput("Explain quantum physics")}>
-                    Quantum Physics
-                  </button>
-                  <button className="suggestion-button" onClick={() => setInput("Help me understand photosynthesis")}>
-                    Photosynthesis
-                  </button>
-                  <button className="suggestion-button" onClick={() => setInput("What is machine learning?")}>
-                    Machine Learning
-                  </button>
-                </div>
+          <div className="sidebar-content">
+            {response2 ? (
+              <div className="resource-section">
+                <h3>Helpful Links</h3>
+                <div className="resource-links">{formatLinks(response2)}</div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="empty-state">
+                <p>No resources available yet. Ask a question to get helpful links.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="sidebar-footer">
+            <p>Powered by AI Chat</p>
+          </div>
         </div>
 
-        <div className="chat-input-container">
-          <form onSubmit={handleSubmit} className="chat-form">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a question..."
-              required
-              className="chat-input"
-              disabled={loading}
-            />
-            <button type="submit" className="send-button" disabled={loading}>
-              {loading ? <span className="loading-spinner"></span> : <SendIcon />}
-            </button>
-          </form>
-          {loading && <div className="loading-indicator">Processing your question...</div>}
+        {/* Main Content */}
+        <div className={`main-content ${sidebarOpen ? "" : "expanded"}`}>
+          {showHistory ? (
+            <div className="history-container">
+              {chatHistory.length ? chatHistory.map((chat, idx) => (
+                <div key={idx} className="history-item">
+                  <p className="history-message"><strong>You:</strong> {chat.message}</p>
+                  <p className="history-response"><strong>Bot:</strong> {chat.response1}</p>
+                </div>
+              )) : <p>No chat history available.</p>}
+            </div>
+          ) : (
+            <>
+              <div className="chat-header">
+                <h1 className="app-title">
+                  <span className="title-gradient">Study</span> With Me
+                </h1>
+                {!sidebarOpen && (
+                  <button className="sidebar-toggle-mobile" onClick={toggleSidebar} aria-label="Open sidebar">
+                    <MenuIcon />
+                  </button>
+                )}
+              </div>
+
+              <div className="chat-messages">
+                {error && <div className="error-message">{error}</div>}
+
+                {response1 && (
+                  <div className="response-message">
+                    <div className="message-content">{formatResponseText(response1)}</div>
+                  </div>
+                )}
+
+                {!response1 && !error && (
+                  <div className="welcome-message">
+                    <h2 className="welcome-title">
+                      Welcome to <span className="title-gradient">Study With Me</span>
+                    </h2>
+                    <p>Ask any question to get started. I'm here to help with your studies!</p>
+                    <div className="welcome-suggestions">
+                      <p className="suggestion-title">Try asking about:</p>
+                      <div className="suggestion-buttons">
+                        <button className="suggestion-button" onClick={() => setInput("Explain quantum physics")}>
+                          Quantum Physics
+                        </button>
+                        <button className="suggestion-button" onClick={() => setInput("Help me understand photosynthesis")}>
+                          Photosynthesis
+                        </button>
+                        <button className="suggestion-button" onClick={() => setInput("What is machine learning?")}>
+                          Machine Learning
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="chat-input-container">
+                <form onSubmit={handleSubmit} className="chat-form">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Ask a question..."
+                    required
+                    className="chat-input"
+                    disabled={loading}
+                  />
+                  <button type="submit" className="send-button" disabled={loading}>
+                    {loading ? <span className="loading-spinner"></span> : <SendIcon />}
+                  </button>
+                </form>
+                {loading && <div className="loading-indicator">Processing your question...</div>}
+              </div>
+            </>
+          )}
         </div>
       </div>
-    </div>
+    )
   )
 }
 
