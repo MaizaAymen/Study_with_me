@@ -74,7 +74,7 @@ const User = mongoose.model('User', userSchema);
 
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: '*',
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization'
 }));
@@ -141,11 +141,10 @@ app.post('/chat', authenticateToken, async (req, res) => {
     Ensure clarity, coherence, and a professional tone throughout. 
     Format it properly with headings and bullet points if necessary.`;
 
-    try {
-        const response1 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    try {        const response1 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer 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`,
+                "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -171,12 +170,10 @@ app.post('/chat', authenticateToken, async (req, res) => {
             return res.status(500).json({ error: "No valid response from first query" });
         }
 
-        const prompt2 = `Give me only 4 free and valid URLs of documentation from different websites related to this question: ${message}`;
-
-        const response2 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const prompt2 = `Give me only 4 free and valid URLs of documentation from different websites related to this question: ${message}`;        const response2 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer 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`,
+                "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -253,6 +250,3 @@ if (require.main === module) {
 
 // Export Express app for testing
 module.exports = app;
-
-const apikey = process.env.apikey;
-console.log(apikey);

@@ -1,0 +1,30 @@
+{
+  "chatHistory": [
+    {
+      "id": "1",
+      "message": "What is quantum physics?",
+      "response1": "Quantum physics, also known as quantum mechanics, is a branch of physics that deals with the behavior of matter and energy at the smallest scales, particularly at the level of atoms and subatomic particles.",
+      "response2": "It explains phenomena that classical physics cannot, such as wave-particle duality, quantum entanglement, and the uncertainty principle. These concepts form the basis for many modern technologies like lasers, transistors, and potentially quantum computers."
+    },
+    {
+      "id": "2",
+      "message": "How do I prepare for a math exam?",
+      "response1": "To prepare for a math exam, start by reviewing your notes, textbook chapters, and previous homework assignments. Focus on understanding core concepts rather than just memorizing formulas.",
+      "response2": "Practice is crucial - work through as many example problems as possible, including those that weren't assigned. Try explaining concepts to yourself or others, and form a study group if helpful. Get plenty of rest before the exam and arrive prepared with required materials."
+    }
+  ],
+  "mockResponses": {
+    "greeting": {
+      "message1": "Hello! I'm your AI study assistant. How can I help you today with your studies?",
+      "message2": "I can explain concepts, provide learning strategies, or help you organize study materials. Just let me know what subject you're working on!"
+    },
+    "mathHelp": {
+      "message1": "When approaching algebraic equations, it helps to think of them as puzzles where you need to isolate the variable. The key principle is that whatever operation you perform on one side of the equation, you must do to the other side as well.",
+      "message2": "For example, to solve 2x + 3 = 7, first subtract 3 from both sides: 2x = 4. Then divide both sides by 2: x = 2. Practice by breaking down complex equations into these simple steps."
+    },
+    "scienceHelp": {
+      "message1": "The scientific method consists of several steps: observation, question formulation, hypothesis development, experimentation, data analysis, and conclusion. It's a systematic approach to understanding the natural world.",
+      "message2": "When studying scientific concepts, try to connect them to real-world examples. For instance, understanding Newton's laws of motion becomes easier when you think about everyday experiences like riding in a car or playing sports."
+    }
+  }
+}

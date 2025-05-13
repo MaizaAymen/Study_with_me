@@ -1,13 +1,12 @@
-// tests/e2e/app.test.js
-import { Builder, By, until } from 'selenium-webdriver';
-import 'chromedriver';
+const { Builder, By, until } = require('selenium-webdriver');
+require('chromedriver');
 
 (async function e2eTest() {
   let driver;
   try {
     driver = await new Builder().forBrowser('chrome').build();
     await driver.get('http://localhost:5173/login');
-
+    
     // Wait for the login username input to be visible
     await driver.wait(until.elementLocated(By.css("input[placeholder='Username']")), 5000);
     console.log('✅ Login page loaded and username field is visible.');

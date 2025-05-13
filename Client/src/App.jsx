@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import "./App.css"
 
 const fetchWithTimeout = (url, options, timeout = 60000) => {
@@ -365,8 +365,8 @@ function App() {
     <nav className="navbar">
       <h1 className="nav-title">Study With Me</h1>
       <div className="nav-links">
-        <button className={`nav-item ${!showHistory ? 'active' : ''}`} onClick={() => setShowHistory(false)}>Chat</button>
-        <button className={`nav-item ${showHistory ? 'active' : ''}`} onClick={() => setShowHistory(true)}>History</button>
+        <button className={`nav-item ${!showHistory ? 'active' : ''}`} onClick={() => setShowHistory(false)} data-cy="chat-tab">Chat</button>
+        <button className={`nav-item ${showHistory ? 'active' : ''}`} onClick={() => setShowHistory(true)} data-cy="history-tab">History</button>
       </div>
     </nav>
   )
@@ -383,29 +383,29 @@ function App() {
         <div className="book book1"></div>
         <div className="book book2"></div>
         <div className="book book3"></div>
-        <form className="auth-form" onSubmit={handleAuth}>
+        <form className="auth-form" onSubmit={handleAuth} data-cy="auth-form">
           <h2>{authMode === 'login' ? 'Login' : 'Register'}</h2>
           {authError && <div className="auth-error">{authError}</div>}
           {authMode === 'register' && (
             <>
-              <input type="text" placeholder="Full Name" value={authName} onChange={e => setAuthName(e.target.value)} className="auth-input" disabled={authLoading} />
-              <input type="email" placeholder="Email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} className="auth-input" disabled={authLoading} />
-              <select value={authRole} onChange={e => setAuthRole(e.target.value)} className="auth-input auth-select" disabled={authLoading}>
+              <input type="text" placeholder="Full Name" value={authName} onChange={e => setAuthName(e.target.value)} className="auth-input" disabled={authLoading} data-cy="register-name" />
+              <input type="email" placeholder="Email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} className="auth-input" disabled={authLoading} data-cy="register-email" />
+              <select value={authRole} onChange={e => setAuthRole(e.target.value)} className="auth-input auth-select" disabled={authLoading} data-cy="register-role">
                 <option value="">Select Role</option>
                 <option value="student">Student</option>
                 <option value="teacher">Teacher</option>
               </select>
             </>
           )}
-          <input type="text" placeholder="Username" value={authUser} onChange={e => setAuthUser(e.target.value)} className="auth-input" required disabled={authLoading} />
-          <input type="password" placeholder="Password" value={authPass} onChange={e => setAuthPass(e.target.value)} className="auth-input" required disabled={authLoading} />
-          {authMode === 'register' && <input type="password" placeholder="Confirm Password" value={authConfirm} onChange={e => setAuthConfirm(e.target.value)} className="auth-input" required disabled={authLoading} />}
-          <button type="submit" className="auth-button" disabled={authLoading}>
+          <input type="text" placeholder="Username" value={authUser} onChange={e => setAuthUser(e.target.value)} className="auth-input" required disabled={authLoading} data-cy="auth-username" />
+          <input type="password" placeholder="Password" value={authPass} onChange={e => setAuthPass(e.target.value)} className="auth-input" required disabled={authLoading} data-cy="auth-password" />
+          {authMode === 'register' && <input type="password" placeholder="Confirm Password" value={authConfirm} onChange={e => setAuthConfirm(e.target.value)} className="auth-input" required disabled={authLoading} data-cy="register-confirm-password" />}
+          <button type="submit" className="auth-button" disabled={authLoading} data-cy="auth-submit-button">
             {authLoading ? 'Please wait...' : authMode === 'login' ? 'Login' : 'Register'}
           </button>
           <p className="auth-switch">
             {authMode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
-            <button type="button" onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')} className="auth-switch-button">
+            <button type="button" onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')} className="auth-switch-button" data-cy="auth-mode-switch">
               {authMode === 'login' ? 'Register' : 'Login'}
             </button>
           </p>
@@ -414,7 +414,7 @@ function App() {
     ) : (
       <div className="app-container">
         <Navbar />
-        <button className="logout-button" onClick={handleLogout}>Logout</button>
+        <button className="logout-button" onClick={handleLogout} data-cy="logout-button">Logout</button>
         {/* Overlay for mobile when sidebar is open */}
         {sidebarOpen && windowWidth < 768 && (
           <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
@@ -430,6 +430,7 @@ function App() {
               className="sidebar-toggle"
               onClick={toggleSidebar}
               aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+              data-cy="sidebar-toggle"
             >
               <MenuIcon />
             </button>
@@ -456,13 +457,13 @@ function App() {
         {/* Main Content */}
         <div className={`main-content ${sidebarOpen ? "" : "expanded"}`}>
           {showHistory ? (
-            <div className="history-container">
+            <div className="history-container" data-cy="chat-history-container">
               {chatHistory.length ? chatHistory.map((chat, idx) => (
-                <div key={idx} className="history-item">
-                  <p className="history-message"><strong>You:</strong> {chat.message}</p>
-                  <p className="history-response"><strong>Bot:</strong> {chat.response1}</p>
+                <div key={idx} className="history-item" data-cy="history-item">
+                  <p className="history-message" data-cy="history-user-message"><strong>You:</strong> {chat.message}</p>
+                  <p className="history-response" data-cy="history-bot-response"><strong>Bot:</strong> {chat.response1}</p>
                 </div>
-              )) : <p>No chat history available.</p>}
+              )) : <p data-cy="no-history-message">No chat history available.</p>}
             </div>
           ) : (
             <>
@@ -471,37 +472,37 @@ function App() {
                   <span className="title-gradient">Study</span> With Me
                 </h1>
                 {!sidebarOpen && (
-                  <button className="sidebar-toggle-mobile" onClick={toggleSidebar} aria-label="Open sidebar">
+                  <button className="sidebar-toggle-mobile" onClick={toggleSidebar} aria-label="Open sidebar" data-cy="sidebar-toggle-mobile">
                     <MenuIcon />
                   </button>
                 )}
               </div>
 
-              <div className="chat-messages">
-                {error && <div className="error-message">{error}</div>}
+              <div className="chat-messages" data-cy="chat-messages">
+                {error && <div className="error-message" data-cy="error-message">{error}</div>}
 
                 {response1 && (
-                  <div className="response-message">
-                    <div className="message-content">{formatResponseText(response1)}</div>
+                  <div className="response-message" data-cy="ai-response">
+                    <div className="message-content" data-cy="response-content">{formatResponseText(response1)}</div>
                   </div>
                 )}
 
                 {!response1 && !error && (
-                  <div className="welcome-message">
-                    <h2 className="welcome-title">
+                  <div className="welcome-message" data-cy="welcome-message">
+                    <h2 className="welcome-title" data-cy="welcome-title">
                       Welcome to <span className="title-gradient">Study With Me</span>
                     </h2>
-                    <p>Ask any question to get started. I'm here to help with your studies!</p>
+                    <p data-cy="welcome-text">Ask any question to get started. I'm here to help with your studies!</p>
                     <div className="welcome-suggestions">
                       <p className="suggestion-title">Try asking about:</p>
                       <div className="suggestion-buttons">
-                        <button className="suggestion-button" onClick={() => setInput("Explain quantum physics")}>
+                        <button className="suggestion-button" onClick={() => setInput("Explain quantum physics")} data-cy="suggestion-physics">
                           Quantum Physics
                         </button>
-                        <button className="suggestion-button" onClick={() => setInput("Help me understand photosynthesis")}>
+                        <button className="suggestion-button" onClick={() => setInput("Help me understand photosynthesis")} data-cy="suggestion-photosynthesis">
                           Photosynthesis
                         </button>
-                        <button className="suggestion-button" onClick={() => setInput("What is machine learning?")}>
+                        <button className="suggestion-button" onClick={() => setInput("What is machine learning?")} data-cy="suggestion-ml">
                           Machine Learning
                         </button>
                       </div>
@@ -511,7 +512,7 @@ function App() {
               </div>
 
               <div className="chat-input-container">
-                <form onSubmit={handleSubmit} className="chat-form">
+                <form onSubmit={handleSubmit} className="chat-form" data-cy="chat-form">
                   <input
                     type="text"
                     value={input}
@@ -520,12 +521,13 @@ function App() {
                     required
                     className="chat-input"
                     disabled={loading}
+                    data-cy="chat-input"
                   />
-                  <button type="submit" className="send-button" disabled={loading}>
-                    {loading ? <span className="loading-spinner"></span> : <SendIcon />}
+                  <button type="submit" className="send-button" disabled={loading} data-cy="send-button">
+                    {loading ? <span className="loading-spinner" data-cy="spinner"></span> : <SendIcon />}
                   </button>
                 </form>
-                {loading && <div className="loading-indicator">Processing your question...</div>}
+                {loading && <div className="loading-indicator" data-cy="loading-indicator">Processing your question...</div>}
               </div>
             </>
           )}

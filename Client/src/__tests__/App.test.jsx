@@ -3,10 +3,19 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../App';
 
+// Mock fetch globally for tests
+global.fetch = jest.fn(() => 
+  Promise.resolve({
+    json: () => Promise.resolve({ chats: [] }),
+  })
+);
+
 describe('App Component', () => {
   beforeEach(() => {
     // Clear implementation of localStorage
     jest.spyOn(Storage.prototype, 'getItem').mockImplementation(key => null);
+    // Reset fetch mock before each test
+    fetch.mockClear();
   });
 
   afterEach(() => {
